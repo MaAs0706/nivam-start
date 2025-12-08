@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardians - NIVA</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header with back button -->
+        <header class="niva-header" style="border-radius: 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                <button class="niva-btn btn-small btn-secondary" onclick="window.location.href='home.html'" style="width: auto; padding: 8px 16px;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <h1 style="font-size: 24px; margin: 0;">My Guardians</h1>
+                <div style="width: 60px;"></div> <!-- Spacer -->
+            </div>
+            <p class="header-subtitle">Trusted contacts who receive alerts</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Add New Guardian Form -->
+            <div class="niva-card">
+                <h3 class="card-title"><i class="fas fa-user-plus"></i> Add New Guardian</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Guardian's Name</label>
+                    <input type="text" class="form-input" id="guardianName" placeholder="e.g., Sarah Johnson">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-input" id="guardianPhone" placeholder="10-digit mobile number">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Relationship</label>
+                    <select class="form-input" id="guardianRelation">
+                        <option value="">Select relationship</option>
+                        <option value="parent">Parent</option>
+                        <option value="sibling">Sibling</option>
+                        <option value="friend">Friend</option>
+                        <option value="partner">Partner</option>
+                        <option value="colleague">Colleague</option>
+                        <option value="relative">Relative</option>
+                    </select>
+                </div>
+                
+                <button class="niva-btn btn-primary" onclick="addGuardian()">
+                    <i class="fas fa-shield-alt"></i> Add Guardian
+                </button>
+            </div>
+
+            <!-- Guardians List -->
+            <div class="niva-card">
+                <h3 class="card-title"><i class="fas fa-users"></i> Your Guardians</h3>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">
+                    These trusted contacts will receive emergency alerts if you don't check in.
+                </p>
+                
+                <div id="guardiansList">
+                    <!-- Guardians will be loaded here -->
+                    <div style="text-align: center; padding: 40px 20px;">
+                        <div style="width: 80px; height: 80px; background: #F3F4F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                            <i class="fas fa-user-friends" style="font-size: 32px; color: var(--text-gray);"></i>
+                        </div>
+                        <h4 style="margin-bottom: 8px; color: var(--text-dark);">No Guardians Added</h4>
+                        <p style="color: var(--text-gray); font-size: 14px;">Add your first guardian above to get started with NIVA.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Alert -->
+            <div class="niva-card">
+                <h3 class="card-title"><i class="fas fa-bell"></i> Test Alert System</h3>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">
+                    Send a test alert to verify your guardians receive notifications.
+                </p>
+                <button class="niva-btn" onclick="sendTestAlert()" style="background: #FBBF24; color: #92400E;">
+                    <i class="fas fa-bell"></i> Send Test Alert
+                </button>
+            </div>
+
+            <!-- Guardian Tips -->
+            <div class="niva-card" style="background: #EFF6FF; border-color: #3B82F6;">
+                <h3 class="card-title" style="color: #1D4ED8;"><i class="fas fa-lightbulb"></i> Guardian Tips</h3>
+                <ul style="padding-left: 20px; color: #1E40AF;">
+                    <li style="margin-bottom: 8px;">Choose guardians who are usually available and responsive</li>
+                    <li style="margin-bottom: 8px;">Inform them about NIVA so they recognize the alerts</li>
+                    <li style="margin-bottom: 8px;">Add at least 2-3 guardians for better coverage</li>
+                    <li>Keep guardian information updated</li>
+                </ul>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p class="disclaimer-text">
+                Guardians will receive SMS alerts during emergencies. Ensure phone numbers are correct.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Load guardians from localStorage
+        function loadGuardians() {
+            const guardians = JSON.parse(localStorage.getItem('niva_contacts') || '[]');
+            const guardiansList = document.getElementById('guardiansList');
+            
+            if (guardians.length === 0) {
+                guardiansList.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px;">
+                        <div style="width: 80px; height: 80px; background: #F3F4F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                            <i class="fas fa-user-friends" style="font-size: 32px; color: var(--text-gray);"></i>
+                        </div>
+                        <h4 style="margin-bottom: 8px; color: var(--text-dark);">No Guardians Added</h4>
+                        <p style="color: var(--text-gray); font-size: 14px;">Add your first guardian above to get started with NIVA.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            guardians.forEach((guardian, index) => {
+                // Get relationship icon
+                let relationIcon = 'fas fa-user';
+                switch(guardian.relation) {
+                    case 'parent': relationIcon = 'fas fa-user-friends'; break;
+                    case 'sibling': relationIcon = 'fas fa-user-friends'; break;
+                    case 'friend': relationIcon = 'fas fa-user-friends'; break;
+                    case 'partner': relationIcon = 'fas fa-heart'; break;
+                    case 'colleague': relationIcon = 'fas fa-briefcase'; break;
+                    case 'relative': relationIcon = 'fas fa-users'; break;
+                }
+                
+                html += `
+                    <div class="contact-item">
+                        <div class="contact-info">
+                            <h4><i class="${relationIcon}" style="color: var(--primary-green); margin-right: 8px;"></i> ${guardian.name}</h4>
+                            <p>📱 ${guardian.phone} • ${guardian.relation ? guardian.relation.charAt(0).toUpperCase() + guardian.relation.slice(1) : 'Guardian'}</p>
+                        </div>
+                        <div class="contact-actions">
+                            <button class="delete-btn" onclick="deleteGuardian(${index})" title="Remove guardian">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            guardiansList.innerHTML = html;
+        }
+        
+        // Add new guardian
+        function addGuardian() {
+            const name = document.getElementById('guardianName').value.trim();
+            const phone = document.getElementById('guardianPhone').value.trim();
+            const relation = document.getElementById('guardianRelation').value;
+            
+            if (!name || !phone) {
+                alert('Please enter both name and phone number');
+                return;
+            }
+            
+            // Validate phone number (Indian format)
+            const phoneRegex = /^[6-9]\d{9}$/;
+            if (!phoneRegex.test(phone)) {
+                alert('Please enter a valid 10-digit Indian mobile number');
+                return;
+            }
+            
+            const guardians = JSON.parse(localStorage.getItem('niva_contacts') || '[]');
+            
+            // Check if guardian already exists
+            if (guardians.some(g => g.phone === phone)) {
+                alert('This phone number is already added as a guardian');
+                return;
+            }
+            
+            guardians.push({
+                name,
+                phone,
+                relation,
+                added: new Date().toISOString()
+            });
+            
+            localStorage.setItem('niva_contacts', JSON.stringify(guardians));
+            
+            // Clear form
+            document.getElementById('guardianName').value = '';
+            document.getElementById('guardianPhone').value = '';
+            document.getElementById('guardianRelation').value = '';
+            
+            // Reload guardians
+            loadGuardians();
+            
+            // Show success
+            alert(`✅ ${name} added as your guardian!`);
+            
+            // Request notification permission if not already granted
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+        
+        // Delete guardian
+        function deleteGuardian(index) {
+            if (confirm('Remove this guardian from your emergency contacts?')) {
+                const guardians = JSON.parse(localStorage.getItem('niva_contacts') || '[]');
+                const removed = guardians.splice(index, 1)[0];
+                localStorage.setItem('niva_contacts', JSON.stringify(guardians));
+                loadGuardians();
+                alert(`Removed ${removed.name} from your guardians`);
+            }
+        }
+        
+        // Send test alert
+        function sendTestAlert() {
+            const guardians = JSON.parse(localStorage.getItem('niva_contacts') || '[]');
+            
+            if (guardians.length === 0) {
+                alert('Add at least one guardian first');
+                return;
+            }
+            
+            if (confirm(`Send test alert to ${guardians.length} guardian(s)?\n\nThis is a simulation - no actual messages will be sent.`)) {
+                // Show success message
+                alert(`📱 Test alert simulation successful!\n\n${guardians.length} guardian(s) would have received:\n\n"TEST ALERT: [Your Name] is testing NIVA safety system. Everything is OK."`);
+                
+                // Show browser notification
+                if (Notification.permission === 'granted') {
+                    new Notification('NIVA Test Alert', {
+                        body: 'Test alert simulation completed successfully',
+                        icon: 'https://cdn-icons-png.flaticon.com/512/2991/2991142.png'
+                    });
+                }
+            }
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', loadGuardians);
+    </script>
+</body>
+</html>

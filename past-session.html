@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journey Log - NIVA</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="niva-header" style="background: linear-gradient(135deg, #8B5CF6, #7C3AED);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                <button class="niva-btn btn-small btn-secondary" onclick="window.location.href='home.html'" style="width: auto; padding: 8px 16px;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <h1 style="font-size: 24px; margin: 0;">Journey Log</h1>
+                <div style="width: 60px;"></div> <!-- Spacer -->
+            </div>
+            <p class="header-subtitle">History of your safety sessions</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Stats Summary -->
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalSessions">0</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="safeSessions">0</span>
+                    <span class="stat-label">Safe</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="alertedSessions">0</span>
+                    <span class="stat-label">Alerted</span>
+                </div>
+            </div>
+
+            <!-- Sessions List -->
+            <div class="niva-card">
+                <h3 class="card-title"><i class="fas fa-history"></i> Recent Safety Sessions</h3>
+                <div id="sessionsList" style="margin-top: 20px;">
+                    <!-- Sessions will be loaded here -->
+                    <div style="text-align: center; padding: 40px 20px;">
+                        <div style="width: 80px; height: 80px; background: #F3F4F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                            <i class="fas fa-walking" style="font-size: 32px; color: var(--text-gray);"></i>
+                        </div>
+                        <h4 style="margin-bottom: 8px; color: var(--text-dark);">No Journeys Yet</h4>
+                        <p style="color: var(--text-gray); font-size: 14px;">Start your first safety session from the home page.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Data -->
+            <div class="niva-card">
+                <h3 class="card-title"><i class="fas fa-download"></i> Export Data</h3>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">
+                    Download your safety history for personal records.
+                </p>
+                <button class="niva-btn btn-secondary" onclick="exportData()">
+                    <i class="fas fa-file-export"></i> Export as JSON
+                </button>
+            </div>
+
+            <!-- Safety Tips -->
+            <div class="niva-card" style="background: #F0F9FF; border-color: #0EA5E9;">
+                <h3 class="card-title" style="color: #0369A1;"><i class="fas fa-chart-line"></i> Your Safety Insights</h3>
+                <div style="margin-top: 15px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                        <div style="width: 12px; height: 12px; background: #10B981; border-radius: 50%; margin-right: 12px;"></div>
+                        <div>
+                            <p style="font-weight: 600; margin-bottom: 2px;">Safe Completion Rate</p>
+                            <p style="color: var(--text-gray); font-size: 14px;" id="safetyRate">Loading...</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                        <div style="width: 12px; height: 12px; background: #3B82F6; border-radius: 50%; margin-right: 12px;"></div>
+                        <div>
+                            <p style="font-weight: 600; margin-bottom: 2px;">Average Session Duration</p>
+                            <p style="color: var(--text-gray); font-size: 14px;" id="avgDuration">Loading...</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center;">
+                        <div style="width: 12px; height: 12px; background: #8B5CF6; border-radius: 50%; margin-right: 12px;"></div>
+                        <div>
+                            <p style="font-weight: 600; margin-bottom: 2px;">Most Active Time</p>
+                            <p style="color: var(--text-gray); font-size: 14px;" id="activeTime">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clear History -->
+            <div class="niva-card" style="background: #FEF2F2; border-color: #FCA5A5;">
+                <h3 class="card-title" style="color: #DC2626;"><i class="fas fa-trash-alt"></i> Clear History</h3>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">
+                    Delete all your safety session history. This cannot be undone.
+                </p>
+                <button class="niva-btn" onclick="clearHistory()" style="background: #FCA5A5; color: #7F1D1D;">
+                    <i class="fas fa-trash"></i> Clear All History
+                </button>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p class="disclaimer-text">
+                Your journey log is stored locally on your device. It is not sent to any server.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Load sessions
+        function loadSessions() {
+            const sessions = JSON.parse(localStorage.getItem('niva_sessions') || '[]');
+            const sessionsList = document.getElementById('sessionsList');
+            
+            // Update stats
+            document.getElementById('totalSessions').textContent = sessions.length;
+            const safeSessions = sessions.filter(s => s.status === 'completed').length;
+            document.getElementById('safeSessions').textContent = safeSessions;
+            const alertedSessions = sessions.filter(s => s.status === 'alerted').length;
+            document.getElementById('alertedSessions').textContent = alertedSessions;
+            
+            // Calculate insights
+            if (sessions.length > 0) {
+                const safetyRate = Math.round((safeSessions / sessions.length) * 100);
+                document.getElementById('safetyRate').textContent = `${safetyRate}% of your journeys completed safely`;
+                
+                // Average duration
+                const totalDuration = sessions.reduce((sum, s) => sum + (s.duration || 20), 0);
+                const avgDuration = Math.round(totalDuration / sessions.length);
+                document.getElementById('avgDuration').textContent = `${avgDuration} minutes average`;
+                
+                // Most active time (simplified)
+                document.getElementById('activeTime').textContent = 'Evening (6 PM - 10 PM)';
+            } else {
+                document.getElementById('safetyRate').textContent = 'No data yet';
+                document.getElementById('avgDuration').textContent = 'No data yet';
+                document.getElementById('activeTime').textContent = 'No data yet';
+            }
+            
+            if (sessions.length === 0) {
+                sessionsList.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px;">
+                        <div style="width: 80px; height: 80px; background: #F3F4F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                            <i class="fas fa-walking" style="font-size: 32px; color: var(--text-gray);"></i>
+                        </div>
+                        <h4 style="margin-bottom: 8px; color: var(--text-dark);">No Journeys Yet</h4>
+                        <p style="color: var(--text-gray); font-size: 14px;">Start your first safety session from the home page.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by date (newest first)
+            sessions.sort((a, b) => new Date(b.start) - new Date(a.start));
+            
+            let html = '';
+            sessions.forEach((session, index) => {
+                // Format date
+                const date = new Date(session.start);
+                const dateStr = date.toLocaleDateString('en-IN', { 
+                    day: 'numeric', 
+                    month: 'short',
+                    year: 'numeric'
+                });
+                const timeStr = date.toLocaleTimeString('en-IN', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true
+                });
+                
+                // Status badge
+                let statusBadge = '';
+                if (session.status === 'completed') {
+                    statusBadge = `<span class="status-badge status-completed">
+                        <i class="fas fa-check-circle"></i> Safe
+                    </span>`;
+                } else if (session.status === 'alerted') {
+                    statusBadge = `<span class="status-badge status-emergency">
+                        <i class="fas fa-exclamation-circle"></i> Alerted
+                    </span>`;
+                } else {
+                    statusBadge = `<span class="status-badge status-active">
+                        <i class="fas fa-walking"></i> Active
+                    </span>`;
+                }
+                
+                // Duration
+                const duration = session.duration || 20;
+                
+                html += `
+                    <div class="session-item" style="border-left-color: ${session.status === 'completed' ? '#10B981' : session.status === 'alerted' ? '#EF4444' : '#3B82F6'};">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                <div style="width: 40px; height: 40px; background: ${session.status === 'completed' ? '#D1FAE5' : session.status === 'alerted' ? '#FEE2E2' : '#E0E7FF'}; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas ${session.status === 'completed' ? 'fa-check' : session.status === 'alerted' ? 'fa-bell' : 'fa-walking'}" 
+                                       style="color: ${session.status === 'completed' ? '#059669' : session.status === 'alerted' ? '#DC2626' : '#4F46E5'};">
+                                    </i>
+                                </div>
+                                <div>
+                                    <h4 style="margin-bottom: 2px;">Safety Walk</h4>
+                                    <p style="color: var(--text-gray); font-size: 14px;">${dateStr} • ${timeStr}</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 15px; font-size: 14px;">
+                                <span style="color: var(--text-gray);">
+                                    <i class="far fa-clock" style="margin-right: 4px;"></i> ${duration} min
+                                </span>
+                                <span style="color: var(--text-gray);">
+                                    <i class="fas fa-user-shield" style="margin-right: 4px;"></i> ${session.contacts || 0} guardians
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            ${statusBadge}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            sessionsList.innerHTML = html;
+        }
+        
+        // Export data
+        function exportData() {
+            const sessions = JSON.parse(localStorage.getItem('niva_sessions') || '[]');
+            const contacts = JSON.parse(localStorage.getItem('niva_contacts') || '[]');
+            
+            if (sessions.length === 0 && contacts.length === 0) {
+                alert('No data to export');
+                return;
+            }
+            
+            const data = {
+                exportedAt: new Date().toISOString(),
+                sessions: sessions,
+                contacts: contacts,
+                stats: {
+                    totalSessions: sessions.length,
+                    safeSessions: sessions.filter(s => s.status === 'completed').length,
+                    alertedSessions: sessions.filter(s => s.status === 'alerted').length,
+                    totalContacts: contacts.length
+                }
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            // Create download link
+            const url = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `niva-safety-data-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('✅ Data exported successfully!');
+        }
+        
+        // Clear history
+        function clearHistory() {
+            if (confirm('⚠️ Delete ALL your safety session history?\n\nThis cannot be undone. Your emergency contacts will NOT be deleted.')) {
+                localStorage.removeItem('niva_sessions');
+                localStorage.removeItem('niva_session_end'); // Clear any active session too
+                alert('All history cleared successfully.');
+                loadSessions(); // Refresh display
+            }
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', loadSessions);
+    </script>
+</body>
+</html>

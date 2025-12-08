@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety Session Active - NIVA</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="niva-header" style="background: linear-gradient(135deg, #0EA5E9, #3B82F6);">
+            <div class="header-logo">
+                <i class="fas fa-walking"></i>
+                <h1>Safety Session Active</h1>
+            </div>
+            <p class="header-subtitle">NIVA is monitoring your journey</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Timer Display -->
+            <div class="timer-display">
+                <div class="timer-circle">
+                    <div class="timer-text" id="countdownTimer">20:00</div>
+                </div>
+                <p class="timer-label">Time remaining</p>
+                
+                <!-- Progress Bar -->
+                <div style="max-width: 300px; margin: 30px auto;">
+                    <div style="height: 6px; background: #E5E7EB; border-radius: 3px; overflow: hidden;">
+                        <div id="progressBar" style="height: 100%; background: linear-gradient(90deg, #10B981, #3B82F6); width: 100%; transition: width 1s linear;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--text-gray);">
+                        <span>Started</span>
+                        <span id="endTimeDisplay">20:00 min</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Info -->
+            <div class="niva-card">
+                <h3 class="card-title"><i class="fas fa-info-circle"></i> Session Details</h3>
+                <div style="margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <span style="color: var(--text-gray);">Started at:</span>
+                        <span style="font-weight: 600;" id="startTimeDisplay">Loading...</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <span style="color: var(--text-gray);">Guardians notified:</span>
+                        <span style="font-weight: 600;" id="guardiansCount">0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-gray);">Status:</span>
+                        <span class="status-badge status-active">
+                            <i class="fas fa-circle" style="font-size: 8px;"></i>
+                            Active
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="margin: 30px 0;">
+                <button class="niva-btn btn-primary" onclick="markSafe()" style="margin-bottom: 15px;">
+                    <i class="fas fa-check-circle"></i> I've Reached Safely
+                </button>
+                
+                <button class="niva-btn btn-secondary" onclick="extendSession()">
+                    <i class="fas fa-clock"></i> Add 10 More Minutes
+                </button>
+            </div>
+
+            <!-- Emergency Section -->
+            <div class="niva-card" style="border: 2px solid #EF4444; background: linear-gradient(135deg, #FEF2F2, #FEE2E2);">
+                <h3 class="card-title" style="color: #DC2626;"><i class="fas fa-exclamation-triangle"></i> Emergency Actions</h3>
+                <p style="color: #7F1D1D; margin-bottom: 20px;">
+                    Use these only if you're in danger or need immediate help.
+                </p>
+                
+                <button class="niva-btn btn-emergency" onclick="triggerEmergencyAlert()" style="margin-bottom: 12px;">
+                    <i class="fas fa-bell"></i> Alert Guardians Immediately
+                </button>
+                
+                <button class="niva-btn" onclick="callEmergency()" style="background: #DC2626; color: white;">
+                    <i class="fas fa-phone-alt"></i> Call Emergency: 112
+                </button>
+            </div>
+
+            <!-- What Happens Next -->
+            <div class="niva-card">
+                <h3 class="card-title"><i class="fas fa-question-circle"></i> What Happens Next?</h3>
+                <div style="margin-top: 15px;">
+                    <div style="display: flex; align-items: start; margin-bottom: 12px;">
+                        <div style="background: #E0E7FF; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0;">
+                            <i class="fas fa-bell" style="color: #4F46E5; font-size: 12px;"></i>
+                        </div>
+                        <div>
+                            <p style="font-weight: 600; margin-bottom: 4px;">5 minutes before end</p>
+                            <p style="color: var(--text-gray); font-size: 14px;">You'll get a reminder to check in</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: start; margin-bottom: 12px;">
+                        <div style="background: #FEF3C7; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0;">
+                            <i class="fas fa-exclamation" style="color: #D97706; font-size: 12px;"></i>
+                        </div>
+                        <div>
+                            <p style="font-weight: 600; margin-bottom: 4px;">If timer reaches 0</p>
+                            <p style="color: var(--text-gray); font-size: 14px;">All your guardians will be alerted automatically</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: start;">
+                        <div style="background: #D1FAE5; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0;">
+                            <i class="fas fa-check" style="color: var(--primary-dark); font-size: 12px;"></i>
+                        </div>
+                        <div>
+                            <p style="font-weight: 600; margin-bottom: 4px;">When you tap "I'm Safe"</p>
+                            <p style="color: var(--text-gray); font-size: 14px;">Guardians get "All Safe" notification. Session ends.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p class="disclaimer-text">
+                Keep this page open during your safety walk. Closing it may stop monitoring.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Session variables
+        let sessionEndTime = 0;
+        let totalDuration = 20 * 60; // 20 minutes in seconds
+        let remainingTime = totalDuration;
+        let timerInterval = null;
+        let sessionId = null;
+
+        // Initialize session
+        function initSession() {
+            // Get session end time from localStorage or create new
+            const storedEndTime = localStorage.getItem('niva_session_end');
+            
+            if (storedEndTime && Date.now() < parseInt(storedEndTime)) {
+                // Existing active session
+                sessionEndTime = parseInt(storedEndTime);
+                remainingTime = Math.max(0, Math.floor((sessionEndTime - Date.now()) / 1000));
+            } else {
+                // Create new session
+                sessionEndTime = Date.now() + (totalDuration * 1000);
+                localStorage.setItem('niva_session_end', sessionEndTime.toString());
+                remainingTime = totalDuration;
+            }
+
+            // Update displays
+            updateTimerDisplay();
+            updateSessionDetails();
+            
+            // Start countdown
+            startCountdown();
+            
+            // Request location permission
+            requestLocation();
+            
+            // Request notification permission
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
+        // Start countdown timer
+        function startCountdown() {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                remainingTime = Math.max(0, Math.floor((sessionEndTime - Date.now()) / 1000));
+                updateTimerDisplay();
+                
+                // Check for reminders
+                checkReminders();
+                
+                // Check if session ended
+                if (remainingTime <= 0) {
+                    sessionEnded();
+                }
+            }, 1000);
+        }
+
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+            
+            document.getElementById('countdownTimer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update progress bar
+            const progressPercent = (remainingTime / totalDuration) * 100;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+        }
+
+        // Update session details
+        function updateSessionDetails() {
+            // Start time
+            const startTime = new Date(sessionEndTime - (totalDuration * 1000));
+            document.getElementById('startTimeDisplay').textContent = 
+                startTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            // End time
+            const endTime = new Date(sessionEndTime);
+            document.getElementById('endTimeDisplay').textContent = 
+                endTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            // Guardians count
+            const guardians = JSON.parse(localStorage.getItem('niva_contacts') || '[]');
+            document.getElementById('guardiansCount').textContent = guardians.length;
+        }
+
+        // Check for reminders
+        function checkReminders() {
+            // 5-minute reminder
+            if (remainingTime === 5 * 60) {
+                showReminder('⏰ 5 minutes remaining! Remember to check in when safe.');
+            }
+            
+            // 1-minute reminder
+            if (remainingTime === 60) {
+                showReminder('⏰ 1 minute remaining! Tap "I\'m Safe" or we\'ll alert your guardians.');
+            }
+        }
+
+        // Show reminder
+        function showReminder(message) {
+            // Browser notification
+            if (Notification.permission === 'granted') {
+                new Notification('NIVA Reminder', {
+                    body: message,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/2991/2991142.png'
+                });
+            }
+            
+            // Alert on page
+            alert(message);
+        }
+
+        // Mark safe
+        function markSafe() {
+            if (confirm('Mark this safety session as completed safely?')) {
+                clearInterval(timerInterval);
+                
+                // Update session record
+                const sessions = JSON.parse(localStorage.getItem('niva_sessions') || '[]');
+                if (sessions.length > 0) {
+                    sessions[sessions.length - 1].status = 'completed';
+                    sessions[sessions.length - 1].end = new Date().toISOString();
+                    localStorage.setItem('niva_sessions', JSON.stringify(sessions));
+                }
+                
+                // Clear session end time
+                localStorage.removeItem('niva_session_end');
+                
+                // Show success
+                alert('✅ Your guardians have been notified that you\'re safe!');
+                
+                // Redirect to home
+                window.location.href = 'home.html';
+            }
+        }
+
+        // Extend session
+        function extendSession() {
+            if (confirm('Add 10 more minutes to your safety session?')) {
+                sessionEndTime += 10 * 60 * 1000; // Add 10 minutes
+                totalDuration += 10 * 60;
+                localStorage.setItem('niva_session_end', sessionEndTime.toString());
+                
+                // Update session record
+                const sessions = JSON.parse(localStorage.getItem('niva_sessions') || '[]');
+                if (sessions.length > 0) {
+                    sessions[sessions.length - 1].duration += 10;
+                    localStorage.setItem('niva_sessions', JSON.stringify(sessions));
+                }
+                
+                alert('✅ Session extended by 10 minutes');
+                updateTimerDisplay();
+                updateSessionDetails();
+            }
+        }
+
+        // Emergency alert
+        function triggerEmergencyAlert() {
+            const guardians = JSON.parse(localStorage.getItem('niva_contacts') || '[]');
+            
+            if (guardians.length === 0) {
+                alert('No guardians added. Please add emergency contacts first.');
+                return;
+            }
+            
+            if (confirm('🚨 This will send EMERGENCY alerts to ALL your guardians immediately. Continue?')) {
+                alert(`🚨 EMERGENCY ALERT SENT to ${guardians.length} guardian(s)!`);
+                
+                // Send browser notification
+                if (Notification.permission === 'granted') {
+                    new Notification('🚨 NIVA Emergency Alert', {
+                        body: 'Emergency alerts sent to your guardians',
+                        icon: 'https://cdn-icons-png.flaticon.com/512/2991/2991142.png'
+                    });
+                }
+            }
+        }
+
+        // Call emergency
+        function callEmergency() {
+            if (confirm('Call emergency services (112)?')) {
+                window.location.href = 'tel:112';
+            }
+        }
+
+        // Session ended automatically
+        function sessionEnded() {
+            clearInterval(timerInterval);
+            
+            const guardians = JSON.parse(localStorage.getItem('niva_contacts') || '[]');
+            
+            // Update session record
+            const sessions = JSON.parse(localStorage.getItem('niva_sessions') || '[]');
+            if (sessions.length > 0) {
+                sessions[sessions.length - 1].status = 'alerted';
+                sessions[sessions.length - 1].end = new Date().toISOString();
+                localStorage.setItem('niva_sessions', JSON.stringify(sessions));
+            }
+            
+            // Clear session end time
+            localStorage.removeItem('niva_session_end');
+            
+            // Show alert
+            alert(`⏰ Time's up! ${guardians.length} guardian(s) have been alerted.\n\nYour guardians received: "EMERGENCY: [Your Name] didn't check in from safety session. Please check immediately."`);
+            
+            // Redirect to home
+            window.location.href = 'home.html';
+        }
+
+        // Request location
+        function requestLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        // Store location
+                        localStorage.setItem('niva_last_location', JSON.stringify({
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                            time: Date.now()
+                        }));
+                    },
+                    (error) => {
+                        console.log('Location error:', error);
+                    }
+                );
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initSession);
+    </script>
+</body>
+</html>

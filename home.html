@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIVA Safety - Home</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        
+        <header class="niva-header">
+            <div class="header-logo">
+                <i class="fas fa-shield-alt"></i>
+                <h1>NIVA</h1>
+            </div>
+            <p class="header-subtitle">Smart safety companion for every woman</p>
+        </header>
+
+        
+        <main class="main-content">
+            
+            <div id="activeSessionAlert" class="alert-banner" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Active safety session! <a href="active-session.html" style="color: #DC2626; font-weight: 700;">View →</a></p>
+            </div>
+
+           
+            <button class="niva-btn btn-emergency pulse" onclick="triggerEmergency()">
+                <i class="fas fa-bell"></i>
+                🚨 EMERGENCY ALERT
+            </button>
+
+          
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalSessions">0</span>
+                    <span class="stat-label">Sessions</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="safeTrips">0</span>
+                    <span class="stat-label">Safe Trips</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="contactsCount">0</span>
+                    <span class="stat-label">Guardians</span>
+                </div>
+            </div>
+
+            
+            <div class="feature-grid">
+                <div class="feature-card" onclick="startSafetyWalk()">
+                    <div class="feature-icon">
+                        <i class="fas fa-walking"></i>
+                    </div>
+                    <h3>Start Safety Walk</h3>
+                    <p>Begin a protected journey</p>
+                </div>
+
+                <div class="feature-card" onclick="window.location.href='add-contacts.html'">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h3>Guardians</h3>
+                    <p>Add emergency contacts</p>
+                </div>
+
+                <div class="feature-card" onclick="window.location.href='past-session .html'">
+                    <div class="feature-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3>Journey Log</h3>
+                    <p>View past sessions</p>
+                </div>
+
+                <div class="feature-card" onclick="showSettings()">
+                    <div class="feature-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <h3>Settings</h3>
+                    <p>Customize safety</p>
+                </div>
+            </div>
+
+           
+            <div class="niva-card">
+                <h3 class="card-title"><i class="fas fa-info-circle"></i> How NIVA Protects You</h3>
+                <div style="margin-top: 15px;">
+                    <div style="display: flex; align-items: start; margin-bottom: 12px;">
+                        <div style="background: #D1FAE5; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0;">
+                            <span style="font-weight: 700; color: var(--primary-dark);">1</span>
+                        </div>
+                        <p>Start a safety session when Going out </p>
+                    </div>
+                    <div style="display: flex; align-items: start; margin-bottom: 12px;">
+                        <div style="background: #D1FAE5; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0;">
+                            <span style="font-weight: 700; color: var(--primary-dark);">2</span>
+                        </div>
+                        <p>Walk normally - NIVA monitors your session</p>
+                    </div>
+                    <div style="display: flex; align-items: start;">
+                        <div style="background: #D1FAE5; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0;">
+                            <span style="font-weight: 700; color: var(--primary-dark);">3</span>
+                        </div>
+                        <p>If you don't check in, we alert your guardians automatically</p>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="helpline">
+                <h4><i class="fas fa-phone-alt"></i> Emergency Helplines</h4>
+                <p>112 • 1091 • 1098</p>
+            </div>
+        </main>
+
+        
+        <footer class="app-footer">
+            <button class="niva-btn btn-secondary" onclick="window.location.href='add-contacts.html'">
+                <i class="fas fa-plus"></i> Add Your First Guardian
+            </button>
+            <p class="disclaimer-text">
+                NIVA is a safety assistant tool. In immediate danger, always call emergency services first.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        
+        function checkActiveSession() {
+            const sessionEnd = localStorage.getItem('niva_session_end');
+            if (sessionEnd && Date.now() < parseInt(sessionEnd)) {
+                document.getElementById('activeSessionAlert').style.display = 'flex';
+            }
+        }
+
+        
+        function startSafetyWalk() {
+            const contacts = JSON.parse(localStorage.getItem('niva_contacts') || '[]');
+            
+            if (contacts.length === 0) {
+                if (confirm('Add at least one guardian (emergency contact) before starting a safety session. Go to guardians page?')) {
+                    window.location.href = 'add-contacts.html';
+                }
+                return;
+            }
+
+            
+            const sessionEnd = Date.now() + (20 * 60 * 1000);
+            localStorage.setItem('niva_session_end', sessionEnd);
+            
+            // Create session record
+            const sessions = JSON.parse(localStorage.getItem('niva_sessions') || '[]');
+            sessions.push({
+                id: Date.now(),
+                start: new Date().toISOString(),
+                duration: 20,
+                status: 'active',
+                contacts: contacts.length
+            });
+            localStorage.setItem('niva_sessions', JSON.stringify(sessions));
+            
+            // Redirect to active session page
+            window.location.href = 'active-session.html';
+        }
+
+        // Emergency alert
+        function triggerEmergency() {
+            const contacts = JSON.parse(localStorage.getItem('niva_contacts') || '[]');
+            
+            if (contacts.length === 0) {
+                alert('Please add emergency contacts first from the Guardians page.');
+                window.location.href = 'add-contacts.html';
+                return;
+            }
+
+            if (confirm('🚨 This will send emergency alerts to all your guardians immediately. Continue?')) {
+                alert(`EMERGENCY ALERT SENT to ${contacts.length} guardian(s)!`);
+                
+                // Send browser notification
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification('🚨 NIVA Emergency Alert', {
+                        body: 'Emergency alerts sent to your guardians',
+                        icon: 'https://cdn-icons-png.flaticon.com/512/2991/2991142.png'
+                    });
+                }
+            }
+        }
+
+        // Load stats
+        function loadStats() {
+            // Total sessions
+            const sessions = JSON.parse(localStorage.getItem('niva_sessions') || '[]');
+            document.getElementById('totalSessions').textContent = sessions.length;
+            
+            // Safe trips (completed without alert)
+            const safeTrips = sessions.filter(s => s.status === 'completed').length;
+            document.getElementById('safeTrips').textContent = safeTrips;
+            
+            // Contacts count
+            const contacts = JSON.parse(localStorage.getItem('niva_contacts') || '[]');
+            document.getElementById('contactsCount').textContent = contacts.length;
+        }
+
+        // Settings placeholder
+        function showSettings() {
+            alert('Settings will be available in the next update!');
+        }
+
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkActiveSession();
+            loadStats();
+            
+            // Add slide-in animation
+            setTimeout(() => {
+                document.querySelector('.feature-grid').classList.add('slide-in');
+            }, 100);
+        });
+    </script>
+</body>
+</html>
